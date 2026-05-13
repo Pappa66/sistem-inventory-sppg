@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { useUser } from "@/lib/user-context"
 import { toast } from "sonner"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PageWrapper, ContentCard, DataGrid } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -166,11 +167,11 @@ export function AsistenContent() {
   const totalHariIni = purchases.reduce((sum, p) => sum + (p.total ?? 0), 0)
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 md:px-6 py-8">
+    <PageWrapper>
       <PageHeader title="Asisten Lapangan" description="Input pembelian harian" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
+      <DataGrid cols="2">
+        <ContentCard>
+          <div className="flex items-center gap-4">
             <div className="rounded-full bg-primary/10 p-3">
               <Package className="size-6 text-primary" />
             </div>
@@ -184,10 +185,10 @@ export function AsistenContent() {
                 }).format(totalHariIni)}
               </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
+          </div>
+        </ContentCard>
+        <ContentCard>
+          <div className="flex items-center gap-4">
             <div className="rounded-full bg-primary/10 p-3">
               <ArrowUp className="size-6 text-primary" />
             </div>
@@ -195,20 +196,16 @@ export function AsistenContent() {
               <p className="text-sm text-muted-foreground">Jumlah Transaksi</p>
               <p className="text-2xl font-bold">{purchases.length}</p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </ContentCard>
+      </DataGrid>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Input Pembelian</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={tipe} onValueChange={(v) => setTipe(v as "STOK" | "OPERASIONAL")}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="STOK">Stok</TabsTrigger>
-              <TabsTrigger value="OPERASIONAL">Operasional</TabsTrigger>
-            </TabsList>
+      <ContentCard header="Input Pembelian">
+        <Tabs value={tipe} onValueChange={(v) => setTipe(v as "STOK" | "OPERASIONAL")}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="STOK">Stok</TabsTrigger>
+            <TabsTrigger value="OPERASIONAL">Operasional</TabsTrigger>
+          </TabsList>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <TabsContent value="STOK" className="space-y-4">
@@ -307,14 +304,9 @@ export function AsistenContent() {
               </Button>
             </form>
           </Tabs>
-        </CardContent>
-      </Card>
+      </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Pembelian Hari Ini</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard header="Daftar Pembelian Hari Ini">
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -322,7 +314,7 @@ export function AsistenContent() {
               ))}
             </div>
           ) : purchases.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada pembelian hari ini.</p>
+            <EmptyState title="Belum ada pembelian" description="Belum ada pembelian hari ini" />
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -388,8 +380,7 @@ export function AsistenContent() {
             </Table>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+      </ContentCard>
+    </PageWrapper>
   )
 }

@@ -4,10 +4,9 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useUser } from "@/lib/user-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
-import { PageHeader } from "@/components/page-header"
+import { PageWrapper, PageHeader, DataGrid } from "@/components/layout-utils"
 import {
   Users,
   Package,
@@ -23,6 +22,7 @@ import {
   BarChart3,
   ShoppingBag,
   LayoutDashboard,
+  ArrowRight,
 } from "lucide-react"
 
 const roleLabels: Record<string, string> = {
@@ -88,7 +88,7 @@ const roleActions: Record<string, ActionItem[]> = {
 
 function DashboardSkeleton() {
   return (
-    <div className="flex flex-col gap-6">
+    <PageWrapper>
       <Card>
         <CardHeader>
           <CardTitle>Selamat Datang</CardTitle>
@@ -100,7 +100,7 @@ function DashboardSkeleton() {
       </Card>
       <div>
         <Skeleton className="mb-4 h-6 w-24" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <DataGrid cols="3">
           {Array.from({ length: 3 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="space-y-3 pt-4">
@@ -110,9 +110,9 @@ function DashboardSkeleton() {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </DataGrid>
       </div>
-    </div>
+    </PageWrapper>
   )
 }
 
@@ -129,29 +129,68 @@ export function DashboardContent() {
   if (loading) return <DashboardSkeleton />
 
   return (
-    <div className="flex flex-col gap-6 px-4 md:px-6">
-      <PageHeader title="Dashboard" description={`Selamat datang, ${name} (${roleLabels[role] || role})`} />
+    <PageWrapper>
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">Selamat datang, {name} • {roleLabels[role] || role}</p>
+      </div>
 
-      <div>
-        <h2 className="mb-4 text-lg font-semibold">Menu Cepat</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Status</p>
+              <p className="text-2xl font-bold text-primary">Aktif</p>
+              <p className="text-xs text-muted-foreground">Sistem berjalan normal</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Jam Kerja</p>
+              <p className="text-2xl font-bold">08:00 - 17:00</p>
+              <p className="text-xs text-muted-foreground">Jam operasional standar</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Versi</p>
+              <p className="text-2xl font-bold">v1.0</p>
+              <p className="text-xs text-muted-foreground">Latest version</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold">Menu Cepat</h2>
+          <p className="text-sm text-muted-foreground">Akses fitur utama dengan mudah</p>
+        </div>
+        <DataGrid cols={actions.length > 6 ? "3" : "3"}>
           {actions.map((item) => (
             <Link key={item.label} href={item.href}>
-              <Card className="cursor-pointer transition-shadow hover:shadow-md">
-                <CardContent className="flex flex-col gap-3 pt-4">
-                  <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Card className="h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 group">
+                <CardContent className="flex flex-col gap-3 pt-4 h-full">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                     {iconMap[item.icon]}
                   </div>
-                  <div>
-                    <div className="font-medium">{item.label}</div>
-                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  <div className="flex-1">
+                    <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {item.label}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
+                  <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </CardContent>
               </Card>
             </Link>
           ))}
-        </div>
+        </DataGrid>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

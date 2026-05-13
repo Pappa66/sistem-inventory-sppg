@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useUser } from "@/lib/user-context"
 import { toast } from "sonner"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ArrowUpFromLine } from "lucide-react"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 import { PageHeader } from "@/components/page-header"
 
 type Barang = {
@@ -123,14 +125,10 @@ export function KeluarContent() {
   )
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 md:px-6 py-8">
+    <PageWrapper>
       <PageHeader title="Barang Keluar" description="Catat pengeluaran barang dari gudang" />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Catat Barang Keluar</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard header="Catat Barang Keluar">
           <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label htmlFor="barang">Barang</Label>
@@ -186,14 +184,9 @@ export function KeluarContent() {
               className="mt-1"
             />
           </div>
-        </CardContent>
-      </Card>
+      </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Riwayat Barang Keluar</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard header="Riwayat Barang Keluar">
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -201,7 +194,7 @@ export function KeluarContent() {
               ))}
             </div>
           ) : records.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Belum ada catatan</p>
+            <EmptyState title="Belum ada catatan" />
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -236,8 +229,7 @@ export function KeluarContent() {
             </Table>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+      </ContentCard>
+    </PageWrapper>
   )
 }

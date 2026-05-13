@@ -11,9 +11,13 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "sonner"
-import { Loader2, Plus, Check, X } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { Form, FormGroup, FormSection } from "@/components/ui/form-utils"
+import { RowActions, commonActions } from "@/components/ui/row-actions"
+import { toast } from "sonner"
+import { Loader2, Plus, Check, X, Trash } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 type User = {
   id: string
@@ -40,6 +44,7 @@ export function AdminContent() {
   const [state, action, pending] = useActionState(createUser, undefined)
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   async function loadUsers() {
     const { data } = await supabase
@@ -62,6 +67,7 @@ export function AdminContent() {
       toast.error(state.error)
     }
   }, [state])
+
   async function handleToggle(id: string, current: boolean) {
     setToggling(id)
     try {
@@ -76,121 +82,124 @@ export function AdminContent() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 space-y-8">
+    <PageWrapper>
       <PageHeader title="Admin" description="Kelola pengguna sistem" />
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="size-4" />
-            Tambah Pengguna Baru
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form action={action} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="name">Nama Lengkap</Label>
-              <Input id="name" name="name" placeholder="Nama Lengkap" required />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="Email" required />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" placeholder="Password" required />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="role">Role</Label>
-              <Select name="role" required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles.map(([k, v]) => (
-                    <SelectItem key={k} value={k}>
-                      {v}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="noWa">No WA (opsional)</Label>
-              <Input id="noWa" name="noWa" placeholder="No WA" />
-            </div>
-            <div className="flex items-end">
-              <Button type="submit" disabled={pending} className="w-full">
-                {pending ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
-                {pending ? "Menyimpan..." : "Simpan"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Pengguna</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nama</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>No WA</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((u) => (
+      <ContentCard
+        header={<div className="flex items-center gap-2"><Plus className="size-4" /> Tambah Pengguna Baru</div>}
+      >
+        <Form action={action} layout="grid-2">
+          <FormGroup>
+            <Label htmlFor="name">Nama Lengkap</Label>
+            <Input id="name" name="name" placeholder="Nama Lengkap" required />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" placeholder="Email" required />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" name="password" type="password" placeholder="Password" required />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="role">Role</Label>
+            <Select name="role" required>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Role" />
+              </SelectTrigger>
+              <SelectContent>
+                {roles.map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormGroup>
+          <FormGroup span={2}>
+            <Label htmlFor="noWa">No WA (opsional)</Label>
+            <Input id="noWa" name="noWa" placeholder="No WA" />
+          </FormGroup>
+          <FormGroup span={2}>
+            <Button type="submit" disabled={pending} size="lg" className="w-full">
+              {pending ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+              {pending ? "Menyimpan..." : "Tambah Pengguna"}
+            </Button>
+          </FormGroup>
+        </Form>
+      </ContentCard>
+
+      <ContentCard header="Daftar Pengguna">
+        {loading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+        ) : (
+          <div className="w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>No WA</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right w-12">Aksi</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((u) => (
                   <TableRow key={u.id}>
                     <TableCell className="font-medium">{u.name}</TableCell>
-                    <TableCell>{u.email}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">{roleLabels[u.role] || u.role}</Badge>
                     </TableCell>
-                    <TableCell>{u.noWa || "-"}</TableCell>
+                    <TableCell className="text-sm">{u.noWa || "-"}</TableCell>
                     <TableCell>
                       <Badge variant={u.isActive ? "default" : "destructive"}>
                         {u.isActive ? "Aktif" : "Nonaktif"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant={u.isActive ? "destructive" : "outline"}
-                        size="xs"
-                        onClick={() => handleToggle(u.id, u.isActive)}
-                        disabled={toggling === u.id}
-                      >
-                        {toggling === u.id ? (
-                          <Loader2 className="size-3 animate-spin" />
-                        ) : u.isActive ? (
-                          <X className="size-3" />
-                        ) : (
-                          <Check className="size-3" />
-                        )}
-                        {u.isActive ? "Nonaktifkan" : "Aktifkan"}
-                      </Button>
+                      <RowActions
+                        actions={[
+                          {
+                            label: u.isActive ? "Nonaktifkan" : "Aktifkan",
+                            onClick: () => handleToggle(u.id, u.isActive),
+                            variant: u.isActive ? "destructive" : "default",
+                          },
+                        ]}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          </div>
+        )}
+      </ContentCard>
+
+      <Dialog open={deleteConfirm !== null} onOpenChange={() => setDeleteConfirm(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hapus Pengguna?</DialogTitle>
+            <DialogDescription>
+              Aksi ini tidak dapat dibatalkan. Pengguna akan dihapus dari sistem.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              Batal
+            </Button>
+            <Button variant="destructive" onClick={() => setDeleteConfirm(null)}>
+              Hapus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </PageWrapper>
   )
 }

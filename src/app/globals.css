@@ -1,14 +1,117 @@
 @import "tailwindcss";
-@plugin "daisyui";
 
 @theme {
   --color-primary: oklch(0.55 0.25 265);
-  --color-sidebar: oklch(0.98 0.01 260);
+  --color-primary-foreground: oklch(0.98 0.01 260);
+  --color-secondary: oklch(0.72 0.15 142);
+  --color-secondary-foreground: oklch(0.98 0.01 260);
+  --color-destructive: oklch(0.62 0.22 29);
+  --color-destructive-foreground: oklch(0.98 0.01 260);
+  --color-muted: oklch(0.92 0.02 260);
+  --color-muted-foreground: oklch(0.46 0.02 258);
+  --color-accent: oklch(0.75 0.18 145);
+  --color-accent-foreground: oklch(0.98 0.01 260);
+  --color-background: oklch(0.98 0.01 260);
+  --color-foreground: oklch(0.1 0.01 260);
   --color-border: oklch(0.92 0.02 260);
+  --color-input: oklch(0.92 0.02 260);
+  --color-ring: oklch(0.55 0.25 265);
+  --color-sidebar: oklch(0.98 0.01 260);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.1 0.01 260);
 }
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  html.dark {
+    --color-background: oklch(0.1 0.02 260);
+    --color-foreground: oklch(0.98 0.01 260);
+    --color-muted: oklch(0.2 0.02 260);
+    --color-muted-foreground: oklch(0.7 0.02 260);
+    --color-border: oklch(0.18 0.02 260);
+    --color-input: oklch(0.18 0.02 260);
+    --color-sidebar: oklch(0.15 0.02 260);
+    --color-card: oklch(0.12 0.02 260);
+    --color-card-foreground: oklch(0.98 0.01 260);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .bg-gradient-primary {
+    @apply bg-gradient-to-br from-primary to-primary/80;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:border-primary/20;
+  }
+
+  .table-row-hover {
+    @apply transition-colors duration-150;
+  }
+
+  .table-row-hover:hover {
+    @apply bg-muted/50;
   }
 }

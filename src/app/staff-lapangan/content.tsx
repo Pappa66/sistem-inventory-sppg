@@ -4,13 +4,15 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useUser } from "@/lib/user-context"
 import { toast } from "sonner"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ClipboardCheck, AlertTriangle, CheckCircle, ExternalLink } from "lucide-react"
+import { PageWrapper, ContentCard, DataGrid } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 import { PageHeader } from "@/components/page-header"
 import Link from "next/link"
 
@@ -99,7 +101,7 @@ export function StaffContent() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 space-y-6">
+    <PageWrapper>
       <PageHeader title="Opname Stok Harian" description="Catat stok fisik dan cek selisih">
         <div className="flex gap-2">
           <Link
@@ -112,9 +114,9 @@ export function StaffContent() {
         </div>
       </PageHeader>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
+      <DataGrid cols="2">
+        <ContentCard>
+          <div className="flex items-center gap-4">
             <div className="rounded-full bg-primary/10 p-3">
               <ClipboardCheck className="size-6 text-primary" />
             </div>
@@ -122,10 +124,10 @@ export function StaffContent() {
               <p className="text-sm text-muted-foreground">Total Item</p>
               <p className="text-2xl font-bold">{totalItems}</p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-4 pt-6">
+          </div>
+        </ContentCard>
+        <ContentCard>
+          <div className="flex items-center gap-4">
             <div className={`rounded-full p-3 ${discrepancyItems > 0 ? "bg-amber-100 dark:bg-amber-900/20" : "bg-green-100 dark:bg-green-900/20"}`}>
               {discrepancyItems > 0 ? (
                 <AlertTriangle className="size-6 text-amber-600 dark:text-amber-400" />
@@ -139,20 +141,13 @@ export function StaffContent() {
                 {discrepancyItems}
               </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Daftar Barang</CardTitle>
-            <Button onClick={handleOpname} disabled={saving}>
-              {saving ? "Menyimpan..." : "Simpan Opname"}
-            </Button>
           </div>
-        </CardHeader>
-        <CardContent>
+        </ContentCard>
+      </DataGrid>
+
+      <ContentCard
+        header={<div className="flex items-center justify-between"><span>Daftar Barang</span><Button onClick={handleOpname} disabled={saving}>{saving ? "Menyimpan..." : "Simpan Opname"}</Button></div>}
+      >
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -214,8 +209,7 @@ export function StaffContent() {
               </TableBody>
             </Table>
             </div>
-        </CardContent>
-      </Card>
-    </div>
+      </ContentCard>
+    </PageWrapper>
   )
 }

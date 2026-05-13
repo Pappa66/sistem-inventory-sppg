@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
@@ -10,6 +10,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import * as XLSX from "xlsx"
 import { Download, Share2 } from "lucide-react"
+import { PageWrapper, ContentCard, DataGrid } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 
 type ReportData = {
   label: string
@@ -206,29 +208,30 @@ export function KepalaDapurContent() {
           </div>
 
           {loadingStok ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
+            <ContentCard>
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            </ContentCard>
           ) : (
             <>
-              <Card>
-                <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Barang</TableHead>
-                        <TableHead>Stok Sistem</TableHead>
-                        <TableHead>Stok Fisik</TableHead>
-                        <TableHead>Selisih</TableHead>
-                      </TableRow>
-                    </TableHeader>
+              <ContentCard className="overflow-hidden p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Barang</TableHead>
+                      <TableHead>Stok Sistem</TableHead>
+                      <TableHead>Stok Fisik</TableHead>
+                      <TableHead>Selisih</TableHead>
+                    </TableRow>
+                  </TableHeader>
                     <TableBody>
-                      {reportData.length === 0 ? (
+                        {reportData.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                            Belum ada data
+                          <TableCell colSpan={4} className="text-center py-8">
+                            <EmptyState title="Belum ada data" className="border-0" />
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -247,23 +250,19 @@ export function KepalaDapurContent() {
                       )}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
+              </ContentCard>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                <Card>
-                  <CardHeader><CardTitle className="text-sm text-muted-foreground">Total Barang</CardTitle></CardHeader>
-                  <CardContent><p className="text-2xl font-semibold">{reportData.length}</p></CardContent>
-                </Card>
-                <Card>
-                  <CardHeader><CardTitle className="text-sm text-muted-foreground">Stok Sesuai</CardTitle></CardHeader>
-                  <CardContent><p className="text-2xl font-semibold text-green-600">{reportData.filter(d => d.selisih === 0).length}</p></CardContent>
-                </Card>
-                <Card>
-                  <CardHeader><CardTitle className="text-sm text-muted-foreground">Ada Selisih</CardTitle></CardHeader>
-                  <CardContent><p className="text-2xl font-semibold text-red-600">{reportData.filter(d => d.selisih !== 0).length}</p></CardContent>
-                </Card>
-              </div>
+              <DataGrid cols="3">
+                <ContentCard header="Total Barang">
+                  <p className="text-2xl font-semibold">{reportData.length}</p>
+                </ContentCard>
+                <ContentCard header="Stok Sesuai">
+                  <p className="text-2xl font-semibold text-green-600">{reportData.filter(d => d.selisih === 0).length}</p>
+                </ContentCard>
+                <ContentCard header="Ada Selisih">
+                  <p className="text-2xl font-semibold text-red-600">{reportData.filter(d => d.selisih !== 0).length}</p>
+                </ContentCard>
+              </DataGrid>
             </>
           )}
         </TabsContent>
@@ -284,31 +283,32 @@ export function KepalaDapurContent() {
           </div>
 
           {loadingTva ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
+            <ContentCard>
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            </ContentCard>
           ) : (
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Barang</TableHead>
-                      <TableHead>Pemakaian Teoritis</TableHead>
-                      <TableHead>Pemakaian Aktual</TableHead>
-                      <TableHead>Selisih</TableHead>
-                      <TableHead>%</TableHead>
-                    </TableRow>
-                  </TableHeader>
+            <ContentCard className="overflow-hidden p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Barang</TableHead>
+                    <TableHead>Pemakaian Teoritis</TableHead>
+                    <TableHead>Pemakaian Aktual</TableHead>
+                    <TableHead>Selisih</TableHead>
+                    <TableHead>%</TableHead>
+                  </TableRow>
+                </TableHeader>
                   <TableBody>
-                    {tvaData.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          Belum ada data
-                        </TableCell>
-                      </TableRow>
+                        {tvaData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8">
+                            <EmptyState title="Belum ada data" className="border-0" />
+                          </TableCell>
+                        </TableRow>
                     ) : (
                       tvaData.map((d, i) => (
                         <TableRow key={i}>
@@ -330,8 +330,7 @@ export function KepalaDapurContent() {
                     )}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
+            </ContentCard>
           )}
         </TabsContent>
       </Tabs>

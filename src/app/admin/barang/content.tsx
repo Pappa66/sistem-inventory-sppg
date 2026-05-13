@@ -12,6 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import { Loader2, Plus } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 
 type Barang = {
   id: string
@@ -89,16 +91,11 @@ export function MasterBarangContent() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 space-y-8">
+    <PageWrapper>
       <PageHeader title="Master Barang" description="Kelola data barang" />
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="size-4" />
-            Tambah Barang Baru
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard
+        header={<div className="flex items-center gap-2"><Plus className="size-4" /> Tambah Barang Baru</div>}
+      >
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="kode">Kode Barang</Label>
@@ -149,22 +146,19 @@ export function MasterBarangContent() {
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+      </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Barang</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
+      <ContentCard header="Daftar Barang">
+        {loading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+        ) : barang.length === 0 ? (
+          <EmptyState title="Belum ada barang" description="Tambahkan barang baru menggunakan form di atas" />
+        ) : (
+          <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -189,8 +183,7 @@ export function MasterBarangContent() {
             </Table>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </ContentCard>
+    </PageWrapper>
   )
 }

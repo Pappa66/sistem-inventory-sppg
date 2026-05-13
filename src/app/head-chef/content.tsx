@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useUser } from "@/lib/user-context"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -71,7 +72,7 @@ export function HeadChefContent() {
   }, [])
 
   return (
-    <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 space-y-6">
+    <PageWrapper>
       <PageHeader title="Head Chef" description="Kelola menu dan resep" />
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-6">
@@ -101,7 +102,7 @@ export function HeadChefContent() {
           </>
         )}
       </Tabs>
-    </div>
+    </PageWrapper>
   )
 }
 
@@ -162,11 +163,7 @@ function ResepTab({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Tambah Resep Baru</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard header="Tambah Resep Baru">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Nama Resep</label>
@@ -241,14 +238,9 @@ function ResepTab({
               {saving ? "Menyimpan..." : "Simpan Resep"}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+      </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Resep</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard header="Daftar Resep">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -261,8 +253,8 @@ function ResepTab({
               <TableBody>
                 {reseps.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                    Belum ada resep
+                  <TableCell colSpan={3} className="text-center py-8">
+                    <EmptyState title="Belum ada resep" className="border-0" />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -293,8 +285,7 @@ function ResepTab({
             </TableBody>
           </Table>
             </div>
-        </CardContent>
-      </Card>
+      </ContentCard>
 
       <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
         <DialogContent>
@@ -418,12 +409,8 @@ function MenuTab({
     <div className="space-y-6">
       {hasMenuItems && (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Menu Minggu Ini</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
+          <ContentCard header="Menu Minggu Ini">
+            <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -464,16 +451,11 @@ function MenuTab({
                   </TableBody>
                 </Table>
                 </div>
-              </CardContent>
-            </Card>
+            </ContentCard>
 
             {summary.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Kebutuhan Bahan Total</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
+            <ContentCard header="Kebutuhan Bahan Total">
+              <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -492,18 +474,14 @@ function MenuTab({
                     ))}
                   </TableBody>
                 </Table>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+            </div>
+            </ContentCard>
+
+            )}
         </>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Tambah Menu Baru</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <ContentCard header="Tambah Menu Baru">
           <form onSubmit={handleSubmit} className="space-y-3">
             {items.map((item, i) => (
               <div key={i} className="flex items-center gap-4 rounded-lg border p-3">
@@ -546,8 +524,7 @@ function MenuTab({
               {saving ? "Menyimpan..." : "Simpan Menu"}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+      </ContentCard>
     </div>
   )
 }

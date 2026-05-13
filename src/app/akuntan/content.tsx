@@ -13,6 +13,8 @@ import { createAuditLog } from "@/lib/audit"
 import { toast } from "sonner"
 import { CheckCircle, ImageIcon } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 
 type Pembelian = {
   id: string
@@ -123,9 +125,6 @@ export function AkuntanContent() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold">Verifikasi Pembelian</h2>
-        </div>
         {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i}>
             <CardContent className="space-y-3 pt-4">
@@ -144,16 +143,11 @@ export function AkuntanContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <PageWrapper>
       <PageHeader title="Verifikasi Pembelian" description="Validasi nominal & foto struk sebelum disetujui" />
 
       {ordered.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <CheckCircle className="mb-2 h-12 w-12 text-green-500" />
-            <p>Semua pembelian telah diverifikasi</p>
-          </CardContent>
-        </Card>
+        <EmptyState icon={<CheckCircle className="h-6 w-6" />} title="Semua pembelian telah diverifikasi" />
       ) : (
         <div className="space-y-4">
           {grouped.stok.length > 0 && (
@@ -206,7 +200,7 @@ export function AkuntanContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageWrapper>
   )
 
   function renderCard(p: Pembelian) {

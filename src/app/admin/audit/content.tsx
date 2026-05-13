@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { PageHeader } from "@/components/page-header"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
 
 type AuditLog = {
   id: string
@@ -123,19 +125,17 @@ export function AuditContent() {
     loadLogs()
   }, [])
   return (
-    <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 space-y-6">
+    <PageWrapper>
       <PageHeader title="Audit Log" description="Monitor aktivitas sistem" />
-      <Card>
-        <CardHeader>
-          <CardTitle>Riwayat Aktivitas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
+      <ContentCard header="Riwayat Aktivitas">
+        {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
               ))}
             </div>
+          ) : logs.length === 0 ? (
+            <EmptyState title="Belum ada aktivitas" description="Log audit akan muncul saat ada aktivitas sistem" />
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -208,8 +208,8 @@ export function AuditContent() {
             </Table>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+        </ContentCard>
+      </PageWrapper>
+    )
+  }
+

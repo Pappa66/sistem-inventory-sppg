@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -14,6 +13,9 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { toast } from "sonner"
 import { PlusCircle, Package, Tags, Ruler } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Form, FormGroup } from "@/components/ui/form-utils"
 
 type Barang = {
   id: string
@@ -32,7 +34,7 @@ export function MasterDataContent() {
   const [loading, setLoading] = useState(true)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 md:px-6 py-8 space-y-6">
+    <PageWrapper>
       <PageHeader title="Master Data" description="Kelola barang, kategori, dan satuan" />
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-6">
@@ -60,7 +62,7 @@ export function MasterDataContent() {
           <SatuanTab loading={loading} setLoading={setLoading} />
         </TabsContent>
       </Tabs>
-    </div>
+    </PageWrapper>
   )
 }
 
@@ -119,82 +121,73 @@ function BarangTab({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Tambah Barang Baru</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Kode Barang</label>
-              <Input value={kode} onChange={e => setKode(e.target.value)} placeholder="BRG-001" required className="w-full" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Nama Barang</label>
-              <Input value={nama} onChange={e => setNama(e.target.value)} placeholder="Nama Barang" required className="w-full" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Kategori</label>
-              <Select value={kategoriId} onValueChange={(v) => setKategoriId(v ?? "")}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  {kategoris.map(k => (
-                    <SelectItem key={k.id} value={k.id}>{k.nama}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Satuan</label>
-              <Select value={satuanId} onValueChange={(v) => setSatuanId(v ?? "")}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih Satuan" />
-                </SelectTrigger>
-                <SelectContent>
-                  {satuans.map(s => (
-                    <SelectItem key={s.id} value={s.id}>{s.nama} ({s.singkatan})</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Stok Minimum</label>
-              <Input type="number" value={stokMin} onChange={e => setStokMin(Number(e.target.value))} placeholder="0" className="w-full" />
-            </div>
-            <div className="flex items-end">
-              <Button type="submit" disabled={saving} className="w-full">
-                {saving ? "Menyimpan..." : "Tambah Barang"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      <ContentCard header="Tambah Barang Baru">
+        <Form layout="grid-2" onSubmit={handleSubmit}>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Kode Barang <span className="text-destructive">*</span></label>
+            <Input value={kode} onChange={e => setKode(e.target.value)} placeholder="BRG-001" required className="w-full" />
+          </FormGroup>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Nama Barang <span className="text-destructive">*</span></label>
+            <Input value={nama} onChange={e => setNama(e.target.value)} placeholder="Nama Barang" required className="w-full" />
+          </FormGroup>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Kategori <span className="text-destructive">*</span></label>
+            <Select value={kategoriId} onValueChange={(v) => setKategoriId(v ?? "")}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Kategori" />
+              </SelectTrigger>
+              <SelectContent>
+                {kategoris.map(k => (
+                  <SelectItem key={k.id} value={k.id}>{k.nama}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormGroup>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Satuan <span className="text-destructive">*</span></label>
+            <Select value={satuanId} onValueChange={(v) => setSatuanId(v ?? "")}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Satuan" />
+              </SelectTrigger>
+              <SelectContent>
+                {satuans.map(s => (
+                  <SelectItem key={s.id} value={s.id}>{s.nama} ({s.singkatan})</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormGroup>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Stok Minimum</label>
+            <Input type="number" value={stokMin} onChange={e => setStokMin(Number(e.target.value))} placeholder="0" className="w-full" />
+          </FormGroup>
+          <FormGroup className="flex items-end">
+            <Button type="submit" disabled={saving} className="w-full">
+              {saving ? "Menyimpan..." : "Tambah Barang"}
+            </Button>
+          </FormGroup>
+        </Form>
+      </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Barang</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
+      <ContentCard header="Daftar Barang">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Kode</TableHead>
+                <TableHead>Nama</TableHead>
+                <TableHead>Kategori</TableHead>
+                <TableHead>Satuan</TableHead>
+                <TableHead>Stok Min</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {barang.length === 0 ? (
                 <TableRow>
-                  <TableHead>Kode</TableHead>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>Satuan</TableHead>
-                  <TableHead>Stok Min</TableHead>
+                  <TableCell colSpan={5} className="text-center py-8">
+                    <EmptyState title="Belum ada barang" className="border-0" />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {barang.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                      Belum ada barang
-                    </TableCell>
-                  </TableRow>
                 ) : (
                   barang.map(b => (
                     <TableRow key={b.id}>
@@ -208,9 +201,8 @@ function BarangTab({
                 )}
               </TableBody>
             </Table>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+        </ContentCard>
     </div>
   )
 }
@@ -269,46 +261,37 @@ function KategoriTab({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Tambah Kategori Baru</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Nama Kategori</label>
-              <Input value={nama} onChange={e => setNama(e.target.value)} placeholder="Nama Kategori" required className="w-full" />
-            </div>
-            <div className="flex items-end">
-              <Button type="submit" disabled={saving} className="w-full">
-                <PlusCircle className="size-4" />
-                {saving ? "Menyimpan..." : "Tambah"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      <ContentCard header="Tambah Kategori Baru">
+        <Form layout="grid-2" onSubmit={handleSubmit}>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Nama Kategori <span className="text-destructive">*</span></label>
+            <Input value={nama} onChange={e => setNama(e.target.value)} placeholder="Nama Kategori" required className="w-full" />
+          </FormGroup>
+          <FormGroup className="flex items-end">
+            <Button type="submit" disabled={saving} className="w-full">
+              <PlusCircle className="size-4" />
+              {saving ? "Menyimpan..." : "Tambah"}
+            </Button>
+          </FormGroup>
+        </Form>
+        </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Kategori</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
+      <ContentCard header="Daftar Kategori">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nama</TableHead>
+                <TableHead className="w-24">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {kategoris.length === 0 ? (
                 <TableRow>
-                  <TableHead>Nama</TableHead>
-                  <TableHead className="w-24">Aksi</TableHead>
+                  <TableCell colSpan={2} className="text-center py-8">
+                    <EmptyState title="Belum ada kategori" className="border-0" />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {kategoris.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
-                      Belum ada kategori
-                    </TableCell>
-                  </TableRow>
                 ) : (
                   kategoris.map(k => (
                     <TableRow key={k.id}>
@@ -323,9 +306,8 @@ function KategoriTab({
                 )}
               </TableBody>
             </Table>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+        </ContentCard>
 
       <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
         <DialogContent>
@@ -401,51 +383,42 @@ function SatuanTab({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Tambah Satuan Baru</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Nama Satuan</label>
-              <Input value={nama} onChange={e => setNama(e.target.value)} placeholder="Kilogram" required className="w-full" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Singkatan</label>
-              <Input value={singkatan} onChange={e => setSingkatan(e.target.value)} placeholder="kg" required className="w-full" />
-            </div>
-            <div className="flex items-end">
-              <Button type="submit" disabled={saving} className="w-full">
-                <PlusCircle className="size-4" />
-                {saving ? "Menyimpan..." : "Tambah"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      <ContentCard header="Tambah Satuan Baru">
+        <Form layout="grid-3" onSubmit={handleSubmit}>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Nama Satuan <span className="text-destructive">*</span></label>
+            <Input value={nama} onChange={e => setNama(e.target.value)} placeholder="Kilogram" required className="w-full" />
+          </FormGroup>
+          <FormGroup>
+            <label className="text-xs font-medium text-muted-foreground">Singkatan <span className="text-destructive">*</span></label>
+            <Input value={singkatan} onChange={e => setSingkatan(e.target.value)} placeholder="kg" required className="w-full" />
+          </FormGroup>
+          <FormGroup className="flex items-end">
+            <Button type="submit" disabled={saving} className="w-full">
+              <PlusCircle className="size-4" />
+              {saving ? "Menyimpan..." : "Tambah"}
+            </Button>
+          </FormGroup>
+        </Form>
+      </ContentCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Daftar Satuan</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
+      <ContentCard header="Daftar Satuan">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nama</TableHead>
+                <TableHead>Singkatan</TableHead>
+                <TableHead className="w-24">Aksi</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {satuans.length === 0 ? (
                 <TableRow>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Singkatan</TableHead>
-                  <TableHead className="w-24">Aksi</TableHead>
+                  <TableCell colSpan={3} className="text-center py-8">
+                    <EmptyState title="Belum ada satuan" className="border-0" />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {satuans.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                      Belum ada satuan
-                    </TableCell>
-                  </TableRow>
                 ) : (
                   satuans.map(s => (
                     <TableRow key={s.id}>
@@ -461,9 +434,8 @@ function SatuanTab({
                 )}
               </TableBody>
             </Table>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+        </ContentCard>
 
       <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}>
         <DialogContent>

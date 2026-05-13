@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { useUser } from "@/lib/user-context"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -12,6 +11,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { createAuditLog } from "@/lib/audit"
 import { toast } from "sonner"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { PageWrapper, ContentCard } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
+import { PageHeader } from "@/components/page-header"
 
 type PembelianItem = {
   id: string
@@ -114,12 +116,10 @@ export function ApprovalContent() {
 
   if (loading) {
     return (
-      <div>
-        <h2 className="text-xl font-semibold mb-6">Daftar Pembelian Perlu Disetujui</h2>
+      <PageWrapper>
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="space-y-3 pt-4">
+            <ContentCard key={i}>
                 <Skeleton className="h-4 w-1/3" />
                 <Skeleton className="h-4 w-1/4" />
                 <Skeleton className="h-6 w-1/4" />
@@ -127,29 +127,23 @@ export function ApprovalContent() {
                   <Skeleton className="h-8 w-16" />
                   <Skeleton className="h-8 w-16" />
                 </div>
-              </CardContent>
-            </Card>
+            </ContentCard>
           ))}
         </div>
-      </div>
+      </PageWrapper>
     )
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-6">Daftar Pembelian Perlu Disetujui</h2>
+    <PageWrapper>
+      <PageHeader title="Approval Belanja" description="Daftar pembelian yang perlu disetujui" />
 
       {pembelians.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <p>Tidak ada pembelian yang perlu disetujui</p>
-          </CardContent>
-        </Card>
+        <EmptyState title="Tidak ada pembelian" description="Semua pembelian sudah diproses" />
       ) : (
         <div className="space-y-4">
           {pembelians.map(p => (
-            <Card key={p.id}>
-              <CardContent className="pt-4">
+            <ContentCard key={p.id}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex gap-2">
                     <Badge>{p.tipe}</Badge>
@@ -224,8 +218,7 @@ export function ApprovalContent() {
                     Setujui
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+            </ContentCard>
           ))}
         </div>
       )}
@@ -254,6 +247,6 @@ export function ApprovalContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageWrapper>
   )
 }

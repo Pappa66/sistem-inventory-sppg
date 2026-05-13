@@ -10,6 +10,9 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import * as XLSX from "xlsx"
 import { Download } from "lucide-react"
+import { PageWrapper, ContentCard, DataGrid } from "@/components/layout-utils"
+import { EmptyState } from "@/components/ui/empty-state"
+import { PageHeader } from "@/components/page-header"
 
 type Pembelian = {
   id: string
@@ -108,16 +111,16 @@ export function LaporanContent() {
   }
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Laporan Pembelian Terverifikasi</h2>
-        {!loading && groups.length > 0 && (
+    <PageWrapper>
+      <PageHeader title="Laporan Pembelian" description="Laporan pembelian terverifikasi" />
+      {!loading && groups.length > 0 && (
+        <div className="mb-6 flex items-center justify-end">
           <Button variant="outline" size="sm" onClick={exportExcel}>
             <Download className="mr-1 h-4 w-4" />
             Export Excel
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="mb-4 flex flex-wrap items-end gap-2">
         <div className="flex-1 min-w-36">
@@ -133,14 +136,13 @@ export function LaporanContent() {
 
       {loading ? (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <DataGrid cols="3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i}>
-                <CardHeader><Skeleton className="h-4 w-20" /></CardHeader>
-                <CardContent><Skeleton className="h-8 w-32" /></CardContent>
-              </Card>
+              <ContentCard key={i}>
+                <Skeleton className="h-12 w-full" />
+              </ContentCard>
             ))}
-          </div>
+          </DataGrid>
           {Array.from({ length: 2 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="pt-4 space-y-3">
@@ -153,31 +155,24 @@ export function LaporanContent() {
           ))}
         </div>
       ) : groups.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-            <p>Belum ada pembelian terverifikasi</p>
-          </CardContent>
-        </Card>
+        <EmptyState title="Belum ada pembelian terverifikasi" description="Pembelian yang sudah diverifikasi akan muncul di sini" />
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <Card>
-              <CardHeader><CardTitle className="text-sm text-muted-foreground">Total Stok</CardTitle></CardHeader>
-              <CardContent><p className="text-2xl font-semibold text-sky-600">{rp(grandTotalStok)}</p></CardContent>
-            </Card>
-            <Card>
-              <CardHeader><CardTitle className="text-sm text-muted-foreground">Total Operasional</CardTitle></CardHeader>
-              <CardContent><p className="text-2xl font-semibold text-amber-600">{rp(grandTotalOperasional)}</p></CardContent>
-            </Card>
-            <Card>
-              <CardHeader><CardTitle className="text-sm text-muted-foreground">Grand Total</CardTitle></CardHeader>
-              <CardContent><p className="text-2xl font-semibold">{rp(grandTotal)}</p></CardContent>
-            </Card>
-          </div>
+          <DataGrid cols="3">
+            <ContentCard header="Total Stok">
+              <p className="text-2xl font-semibold text-sky-600">{rp(grandTotalStok)}</p>
+            </ContentCard>
+            <ContentCard header="Total Operasional">
+              <p className="text-2xl font-semibold text-amber-600">{rp(grandTotalOperasional)}</p>
+            </ContentCard>
+            <ContentCard header="Grand Total">
+              <p className="text-2xl font-semibold">{rp(grandTotal)}</p>
+            </ContentCard>
+          </DataGrid>
 
           <div className="space-y-6">
             {groups.map(g => (
-              <Card key={g.date}>
+              <ContentCard key={g.date}>
                 <CardContent className="pt-4">
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="font-medium">{g.label}</h3>
@@ -214,11 +209,11 @@ export function LaporanContent() {
                     <span className="text-amber-600">Operasional: {rp(g.totalOperasional)}</span>
                   </div>
                 </CardContent>
-              </Card>
+              </ContentCard>
             ))}
           </div>
         </>
       )}
-    </div>
+    </PageWrapper>
   )
 }
