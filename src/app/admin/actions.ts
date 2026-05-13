@@ -1,9 +1,9 @@
 "use server"
 
 import bcrypt from "bcryptjs"
-import { supabaseAdmin } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 import { verifySession } from "@/lib/dal"
-import { createAuditLogAdmin } from "@/lib/audit"
+import { createAuditLog } from "@/lib/audit"
 
 export async function createUser(prev: unknown, formData: FormData) {
   const session = await verifySession()
@@ -22,7 +22,7 @@ export async function createUser(prev: unknown, formData: FormData) {
   const validRoles = ["ADMIN", "AKUNTAN", "KEPALA_DAPUR", "HEAD_CHEF", "ASISTEN_LAPANGAN", "STAFF_LAPANGAN"]
   if (!validRoles.includes(role)) return { error: "Role tidak valid" }
 
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await supabase
     .from("User")
     .select("id")
     .eq("email", email)
@@ -32,7 +32,7 @@ export async function createUser(prev: unknown, formData: FormData) {
 
   const hashed = await bcrypt.hash(password, 12)
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("User")
     .insert({
       name,
@@ -47,7 +47,7 @@ export async function createUser(prev: unknown, formData: FormData) {
 
   if (error) return { error: error.message }
 
-  await createAuditLogAdmin({
+  await createAuditLog({
     userId: session.userId,
     action: "CREATE",
     entity: "User",
@@ -62,11 +62,11 @@ export async function toggleUserStatus(userId: string, isActive: boolean) {
   const session = await verifySession()
   if (session.role !== "ADMIN") return
 
-  const { data: old } = await supabaseAdmin.from("User").select("*").eq("id", userId).single()
+  const { data: old } = await supabase.from("User").select("*").eq("id", userId).single()
 
-  await supabaseAdmin.from("User").update({ isActive }).eq("id", userId)
+  await supabase.from("User").update({ isActive }).eq("id", userId)
 
-  await createAuditLogAdmin({
+  await createAuditLog({
     userId: session.userId,
     action: "UPDATE",
     entity: "User",
