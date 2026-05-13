@@ -49,28 +49,32 @@ CREATE TABLE IF NOT EXISTS "WasteItem" ("id" TEXT NOT NULL DEFAULT gen_random_uu
 CREATE TABLE IF NOT EXISTS "AuditLog" ("id" TEXT NOT NULL DEFAULT gen_random_uuid()::text, "userId" TEXT NOT NULL, "action" TEXT NOT NULL, "entity" TEXT NOT NULL, "entityId" TEXT NOT NULL, "oldValue" JSONB, "newValue" JSONB, "alasanEdit" TEXT, "ipAddress" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 -- 3. PRIMARY KEYS & INDEXES
-ALTER TABLE "User" ADD PRIMARY KEY IF NOT EXISTS ("id"); CREATE INDEX IF NOT EXISTS "User_email_idx" ON "User"("email");
-ALTER TABLE "KategoriBarang" ADD PRIMARY KEY IF NOT EXISTS ("id"); CREATE INDEX IF NOT EXISTS "KategoriBarang_nama_idx" ON "KategoriBarang"("nama");
-ALTER TABLE "Satuan" ADD PRIMARY KEY IF NOT EXISTS ("id"); CREATE INDEX IF NOT EXISTS "Satuan_nama_idx" ON "Satuan"("nama");
-ALTER TABLE "Barang" ADD PRIMARY KEY IF NOT EXISTS ("id"); CREATE INDEX IF NOT EXISTS "Barang_kode_idx" ON "Barang"("kode");
-ALTER TABLE "Resep" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "ResepBahan" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "MenuPlan" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "MenuPlanItem" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "Pembelian" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "PembelianItem" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "Verifikasi" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "Stok" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "StokBatch" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "Opname" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "OpnameItem" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "BarangMasuk" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "BarangMasukItem" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "BarangKeluar" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "BarangKeluarItem" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "Waste" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "WasteItem" ADD PRIMARY KEY IF NOT EXISTS ("id");
-ALTER TABLE "AuditLog" ADD PRIMARY KEY IF NOT EXISTS ("id");
+DO $$ BEGIN ALTER TABLE "User" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+CREATE INDEX IF NOT EXISTS "User_email_idx" ON "User"("email");
+DO $$ BEGIN ALTER TABLE "KategoriBarang" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+CREATE INDEX IF NOT EXISTS "KategoriBarang_nama_idx" ON "KategoriBarang"("nama");
+DO $$ BEGIN ALTER TABLE "Satuan" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+CREATE INDEX IF NOT EXISTS "Satuan_nama_idx" ON "Satuan"("nama");
+DO $$ BEGIN ALTER TABLE "Barang" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+CREATE INDEX IF NOT EXISTS "Barang_kode_idx" ON "Barang"("kode");
+DO $$ BEGIN ALTER TABLE "Resep" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "ResepBahan" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "MenuPlan" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "MenuPlanItem" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "Pembelian" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "PembelianItem" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "Verifikasi" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "Stok" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "StokBatch" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "Opname" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "OpnameItem" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "BarangMasuk" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "BarangMasukItem" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "BarangKeluar" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "BarangKeluarItem" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "Waste" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "WasteItem" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN ALTER TABLE "AuditLog" ADD PRIMARY KEY ("id"); EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- 4. FOREIGN KEYS (safe creation)
 DO $$ BEGIN ALTER TABLE "Barang" ADD CONSTRAINT "Barang_kategoriId_fkey" FOREIGN KEY ("kategoriId") REFERENCES "KategoriBarang"("id") ON DELETE RESTRICT ON UPDATE CASCADE; EXCEPTION WHEN duplicate_object THEN null; END $$;
@@ -117,7 +121,7 @@ VALUES (
   'ADMIN',
   true,
   NOW()
-);
+) ON CONFLICT (email) DO NOTHING;
 
 -- Kategori
 INSERT INTO "KategoriBarang" (id, nama) VALUES
@@ -126,7 +130,8 @@ INSERT INTO "KategoriBarang" (id, nama) VALUES
   (gen_random_uuid()::text, 'Sayuran'),
   (gen_random_uuid()::text, 'Buah'),
   (gen_random_uuid()::text, 'Bumbu'),
-  (gen_random_uuid()::text, 'Minuman');
+  (gen_random_uuid()::text, 'Minuman')
+ON CONFLICT (nama) DO NOTHING;
 
 -- Satuan
 INSERT INTO "Satuan" (id, nama, singkatan) VALUES
@@ -137,4 +142,5 @@ INSERT INTO "Satuan" (id, nama, singkatan) VALUES
   (gen_random_uuid()::text, 'Butir', 'bt'),
   (gen_random_uuid()::text, 'Ikat', 'ik'),
   (gen_random_uuid()::text, 'Bungkus', 'bg'),
-  (gen_random_uuid()::text, 'Porsi', 'ps');
+  (gen_random_uuid()::text, 'Porsi', 'ps')
+ON CONFLICT (nama) DO NOTHING;
