@@ -1,13 +1,9 @@
 "use server"
 
-import { createHash } from "crypto"
-import { supabase } from "@/lib/supabase"
+import bcrypt from "bcryptjs"
+import { supabaseAdmin } from "@/lib/supabase"
 import { verifySession } from "@/lib/dal"
-import { createAuditLog } from "@/lib/audit"
-
-function hashPassword(password: string): string {
-  return createHash("sha256").update(password).digest("hex")
-}
+import { createAuditLogAdmin } from "@/lib/audit"
 
 export async function createUser(prev: unknown, formData: FormData) {
   const session = await verifySession()
@@ -26,7 +22,7 @@ export async function createUser(prev: unknown, formData: FormData) {
   const validRoles = ["ADMIN", "AKUNTAN", "KEPALA_DAPUR", "HEAD_CHEF", "ASISTEN_LAPANGAN", "STAFF_LAPANGAN"]
   if (!validRoles.includes(role)) return { error: "Role tidak valid" }
 
-  const { data: existing } = await supabase
+  const { data: existing } = await supabaseAdmin
     .from("User")
     .select("id")
     .eq("email", email)
@@ -34,9 +30,9 @@ export async function createUser(prev: unknown, formData: FormData) {
 
   if (existing) return { error: "Email sudah terdaftar" }
 
-  const hashed = hashPassword(password)
+  const hashed = await bcrypt.hash(password, 12)
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("User")
     .insert({
       name,
@@ -51,7 +47,7 @@ export async function createUser(prev: unknown, formData: FormData) {
 
   if (error) return { error: error.message }
 
-  await createAuditLog({
+  await createAuditLogAdmin({
     userId: session.userId,
     action: "CREATE",
     entity: "User",
@@ -66,11 +62,11 @@ export async function toggleUserStatus(userId: string, isActive: boolean) {
   const session = await verifySession()
   if (session.role !== "ADMIN") return
 
-  const { data: old } = await supabase.from("User").select("*").eq("id", userId).single()
+  const { data: old } = await supabaseAdmin.from("User").select("*").eq("id", userId).single()
 
-  await supabase.from("User").update({ isActive }).eq("id", userId)
+  await supabaseAdmin.from("User").update({ isActive }).eq("id", userId)
 
-  await createAuditLog({
+  await createAuditLogAdmin({
     userId: session.userId,
     action: "UPDATE",
     entity: "User",

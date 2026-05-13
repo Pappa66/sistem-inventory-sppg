@@ -97,7 +97,7 @@ INSERT INTO "User" (id, email, password, name, role, "isActive", "updatedAt")
 VALUES (
   gen_random_uuid()::text,
   'admin@sppg.com',
-  '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
+  '$2b$12$2P4bOxea698BVyQxEco/SORC.0dKp/Uqba9Zlf0oNiQvLxa8.M7jO',
   'Super Admin',
   'ADMIN',
   true,

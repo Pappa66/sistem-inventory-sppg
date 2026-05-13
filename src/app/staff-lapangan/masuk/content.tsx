@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowDownToLine } from "lucide-react"
 import { PageWrapper, ContentCard } from "@/components/layout-utils"
 import { EmptyState } from "@/components/ui/empty-state"
+import { FefoBadge } from "@/components/ui/fefo-badge"
 import { PageHeader } from "@/components/page-header"
 
 type Barang = {
@@ -192,7 +193,7 @@ export function MasukContent() {
                       <TableCell>{formatDate(r.tanggal)}</TableCell>
                       <TableCell className="font-medium">{item.barang.nama}</TableCell>
                       <TableCell>{item.jumlah}</TableCell>
-                      <TableCell>{formatDate(item.tanggalExp)}</TableCell>
+                      <TableCell><FefoBadge tanggalExp={item.tanggalExp} /></TableCell>
                     </TableRow>
                   ))
                 )}

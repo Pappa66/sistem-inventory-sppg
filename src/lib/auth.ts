@@ -1,13 +1,9 @@
 "use server"
 
-import { createHash } from "crypto"
-import { supabase } from "./supabase"
+import bcrypt from "bcryptjs"
+import { supabaseAdmin } from "./supabase"
 import { createSession, deleteSession } from "./session"
 import { redirect } from "next/navigation"
-
-function hashPassword(password: string): string {
-  return createHash("sha256").update(password).digest("hex")
-}
 
 type LoginState = { error?: string } | undefined
 
@@ -19,7 +15,7 @@ export async function login(state: LoginState, formData: FormData): Promise<Logi
     return { error: "Email dan password wajib diisi" }
   }
 
-  const { data: user, error } = await supabase
+  const { data: user, error } = await supabaseAdmin
     .from("User")
     .select("*")
     .eq("email", email)
@@ -33,8 +29,7 @@ export async function login(state: LoginState, formData: FormData): Promise<Logi
     return { error: "Akun tidak aktif, hubungi Admin" }
   }
 
-  const hashed = hashPassword(password)
-  if (user.password !== hashed) {
+  if (!await bcrypt.compare(password, user.password)) {
     return { error: "Password salah" }
   }
 
