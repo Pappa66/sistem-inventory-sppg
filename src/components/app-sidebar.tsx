@@ -34,6 +34,7 @@ import {
   ShoppingBag,
   LogOut,
   Building2,
+  PackageSearch,
 } from "lucide-react"
 
 const roleLabels: Record<string, string> = {
@@ -48,6 +49,7 @@ const roleLabels: Record<string, string> = {
 const roleMenus: Record<string, { label: string; href: string; icon: React.ReactNode }[]> = {
   ADMIN: [
     { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard /> },
+    { label: "Inventaris", href: "/inventory", icon: <PackageSearch /> },
     { label: "Kelola Pengguna", href: "/admin", icon: <Users /> },
     { label: "Log Audit", href: "/admin/audit", icon: <ClipboardList /> },
     { label: "Master Data", href: "/master-data", icon: <Package /> },
