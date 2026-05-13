@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { MoreHorizontal, Trash2, Edit, Eye, Copy, Download, Trash } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,11 +28,9 @@ export function RowActions({ actions, label = "Actions" }: RowActionsProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="ghost" size="icon-sm">
-          <MoreHorizontal className="h-4 w-4" />
-          <span className="sr-only">{label}</span>
-        </Button>
+      <DropdownMenuTrigger className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted transition-colors">
+        <MoreHorizontal className="h-4 w-4" />
+        <span className="sr-only">{label}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {defaultActions.map((action) => (
