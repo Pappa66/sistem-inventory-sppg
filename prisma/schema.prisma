@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  AKUNTAN
+  KEPALA_DAPUR
+  HEAD_CHEF
+  ASISTEN_LAPANGAN
+  STAFF_LAPANGAN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role
+  isActive  Boolean  @default(true)
+  noWa      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs    AuditLog[]
+  pembelian    Pembelian[]
+  opnames      Opname[]
+  barangMasuk  BarangMasuk[]
+  barangKeluar BarangKeluar[]
+  waste        Waste[]
+  verifikasi   Verifikasi[]
+  menuPlans    MenuPlan[]
+  reseps       Resep[]
+}
+
+model Barang {
+  id         String   @id @default(uuid())
+  kode       String   @unique
+  nama       String
+  kategoriId String
+  kategori   KategoriBarang @relation(fields: [kategoriId], references: [id])
+  satuanId   String
+  satuan     Satuan   @relation(fields: [satuanId], references: [id])
+  stokMinimum Int     @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  stok              Stok[]
+  pembelianItems    PembelianItem[]
+  resepBahan        ResepBahan[]
+  opnameItems       OpnameItem[]
+  barangMasukItems  BarangMasukItem[]
+  barangKeluarItems BarangKeluarItem[]
+  wasteItems        WasteItem[]
+}
+
+model KategoriBarang {
+  id     String   @id @default(uuid())
+  nama   String   @unique
+
+  barang Barang[]
+}
+
+model Satuan {
+  id        String   @id @default(uuid())
+  nama      String   @unique
+  singkatan String
+
+  barang Barang[]
+}
+
+model MenuPlan {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tanggal   DateTime
+  hari      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items MenuPlanItem[]
+}
+
+model MenuPlanItem {
+  id         String   @id @default(uuid())
+  menuPlanId String
+  menuPlan   MenuPlan @relation(fields: [menuPlanId], references: [id])
+  resepId    String
+  resep      Resep    @relation(fields: [resepId], references: [id])
+  porsi      Int      @default(1)
+  createdAt  DateTime @default(now())
+}
+
+model Resep {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  nama      String
+  deskripsi String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bahan     ResepBahan[]
+  menuItems MenuPlanItem[]
+}
+
+model ResepBahan {
+  id       String @id @default(uuid())
+  resepId  String
+  resep    Resep  @relation(fields: [resepId], references: [id])
+  barangId String
+  barang   Barang @relation(fields: [barangId], references: [id])
+  jumlah   Float
+}
+
+enum TipePembelian {
+  STOK
+  OPERASIONAL
+}
+
+enum StatusPembelian {
+  DRAFT
+  VERIFIED
+  REJECTED
+}
+
+model Pembelian {
+  id           String         @id @default(uuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id])
+  tipe         TipePembelian
+  tanggal      DateTime       @default(now())
+  total        Float?
+  keterangan   String?
+  fotoStruk    String?
+  status       StatusPembelian @default(DRAFT)
+  verifiedById String?
+  verifiedAt   DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  items      PembelianItem[]
+  verifikasi Verifikasi[]
+  barangMasuk BarangMasuk[] @relation("BarangMasukPembelian")
+}
+
+model PembelianItem {
+  id          String    @id @default(uuid())
+  pembelianId String
+  pembelian   Pembelian @relation(fields: [pembelianId], references: [id])
+  barangId    String?
+  barang      Barang?   @relation(fields: [barangId], references: [id])
+  namaBarang  String?
+  jumlah      Float?
+  satuan      String?
+  hargaSatuan Float?
+  subtotal    Float?
+  createdAt   DateTime  @default(now())
+}
+
+enum StatusVerifikasi {
+  MENUNGGU
+  VALID
+  DITOLAK
+}
+
+model Verifikasi {
+  id          String           @id @default(uuid())
+  pembelianId String
+  pembelian   Pembelian        @relation(fields: [pembelianId], references: [id])
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  catatan     String?
+  status      StatusVerifikasi
+  createdAt   DateTime         @default(now())
+}
+
+model Stok {
+  id        String   @id @default(uuid())
+  barangId  String
+  barang    Barang   @relation(fields: [barangId], references: [id])
+  jumlah    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  batch StokBatch[]
+}
+
+model StokBatch {
+  id         String    @id @default(uuid())
+  stokId     String
+  stok       Stok      @relation(fields: [stokId], references: [id])
+  noBatch    String?
+  tanggalExp DateTime?
+  jumlah     Float
+  createdAt  DateTime  @default(now())
+}
+
+model Opname {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tanggal   DateTime @default(now())
+  catatan   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     OpnameItem[]
+}
+
+model OpnameItem {
+  id         String @id @default(uuid())
+  opnameId   String
+  opname     Opname @relation(fields: [opnameId], references: [id])
+  barangId   String
+  barang     Barang @relation(fields: [barangId], references: [id])
+  stokSistem Float
+  stokFisik  Float
+  selisih    Float
+}
+
+model BarangMasuk {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  pembelianId String?
+  pembelian   Pembelian? @relation("BarangMasukPembelian", fields: [pembelianId], references: [id])
+  tanggal     DateTime  @default(now())
+  catatan     String?
+  createdAt   DateTime  @default(now())
+
+  items     BarangMasukItem[]
+}
+
+model BarangMasukItem {
+  id            String       @id @default(uuid())
+  barangMasukId String
+  barangMasuk   BarangMasuk  @relation(fields: [barangMasukId], references: [id])
+  barangId      String
+  barang        Barang       @relation(fields: [barangId], references: [id])
+  jumlah        Float
+  tanggalExp    DateTime?
+}
+
+model BarangKeluar {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tanggal   DateTime @default(now())
+  alasan    String
+  catatan   String?
+  createdAt DateTime @default(now())
+
+  items     BarangKeluarItem[]
+}
+
+model BarangKeluarItem {
+  id             String        @id @default(uuid())
+  barangKeluarId String
+  barangKeluar   BarangKeluar  @relation(fields: [barangKeluarId], references: [id])
+  barangId       String
+  barang         Barang        @relation(fields: [barangId], references: [id])
+  jumlah         Float
+}
+
+model Waste {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tanggal   DateTime @default(now())
+  alasan    String
+  catatan   String?
+  createdAt DateTime @default(now())
+
+  items     WasteItem[]
+}
+
+model WasteItem {
+  id       String @id @default(uuid())
+  wasteId  String
+  waste    Waste  @relation(fields: [wasteId], references: [id])
+  barangId String
+  barang   Barang @relation(fields: [barangId], references: [id])
+  jumlah   Float
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  entity     String
+  entityId   String
+  oldValue   Json?
+  newValue   Json?
+  alasanEdit String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
