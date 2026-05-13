@@ -50,13 +50,13 @@ CREATE TABLE IF NOT EXISTS "AuditLog" ("id" TEXT NOT NULL DEFAULT gen_random_uui
 
 -- 3. PRIMARY KEYS & INDEXES
 DO $$ BEGIN ALTER TABLE "User" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
-CREATE INDEX IF NOT EXISTS "User_email_idx" ON "User"("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 DO $$ BEGIN ALTER TABLE "KategoriBarang" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
-CREATE INDEX IF NOT EXISTS "KategoriBarang_nama_idx" ON "KategoriBarang"("nama");
+CREATE UNIQUE INDEX IF NOT EXISTS "KategoriBarang_nama_key" ON "KategoriBarang"("nama");
 DO $$ BEGIN ALTER TABLE "Satuan" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
-CREATE INDEX IF NOT EXISTS "Satuan_nama_idx" ON "Satuan"("nama");
+CREATE UNIQUE INDEX IF NOT EXISTS "Satuan_nama_key" ON "Satuan"("nama");
 DO $$ BEGIN ALTER TABLE "Barang" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
-CREATE INDEX IF NOT EXISTS "Barang_kode_idx" ON "Barang"("kode");
+CREATE UNIQUE INDEX IF NOT EXISTS "Barang_kode_key" ON "Barang"("kode");
 DO $$ BEGIN ALTER TABLE "Resep" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
 DO $$ BEGIN ALTER TABLE "ResepBahan" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
 DO $$ BEGIN ALTER TABLE "MenuPlan" ADD PRIMARY KEY ("id"); EXCEPTION WHEN OTHERS THEN null; END $$;
@@ -121,7 +121,12 @@ VALUES (
   'ADMIN',
   true,
   NOW()
-) ON CONFLICT (email) DO NOTHING;
+) ON CONFLICT (email) DO UPDATE SET
+  password = EXCLUDED.password,
+  name = EXCLUDED.name,
+  role = EXCLUDED.role,
+  "isActive" = EXCLUDED."isActive",
+  "updatedAt" = NOW();
 
 -- Kategori
 INSERT INTO "KategoriBarang" (id, nama) VALUES
